@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>@takenncs BodyCam System</title>
+
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    font-family: 'Share Tech Mono', monospace, monospace;
+    font-size: 14px;
+    color: #e0e0e0;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .top-right-container {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    background: rgba(10, 10, 10, 0.75);
+    border-radius: 12px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 280px;
+    max-width: 350px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    z-index: 9999;
+  }
+
+  .logo {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    object-fit: contain;
+  }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .rec {
+    font-weight: 700;
+    font-size: 18px;
+    color: #ff4444;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .rec .dot {
+    width: 14px;
+    height: 14px;
+    background: #ff0000;
+    border-radius: 50%;
+    animation: blink 1.5s cubic-bezier(.5, 0, 1, 1) infinite alternate;
+  }
+
+  .player-name, .callsign, .agency, .date {
+    font-weight: 500;
+    letter-spacing: 1px;
+  }
+
+  .date {
+    font-size: 12px;
+    color: #bbb;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+</style>
+</head>
+
+<body>
+  <div class="top-right-container" id="bodycam-ui" style="display:none;">
+    <img src="nui://qb-core/ui/img/logo.png" alt="Logo" class="logo" />
+    <div class="info">
+      <div class="rec">
+        REC <div class="dot"></div>
+        <span>&nbsp;Cam™</span>
+      </div>
+      <div class="player-name" id="player">PlayerName</div>
+      <div class="callsign" id="callsign">[000]</div>
+      <div class="agency" id="agency">Police Department</div>
+      <div class="date" id="month">00/00/0000 - 00:00:00 GMT+3</div>
+    </div>
+  </div>
+
+<script>
+  window.addEventListener("message", function(event) {
+    const data = event.data;
+    if(data.action === "showbodycam") {
+      document.getElementById("bodycam-ui").style.display = "flex";
+      document.getElementById("player").textContent = data.player || "PlayerName";
+      document.getElementById("callsign").textContent = data.callsign || "[000]";
+      document.getElementById("month").textContent = data.tarih || "00/00/0000 - 00:00:00 GMT+3";
+    } else if(data.action === "hidebodycam") {
+      document.getElementById("bodycam-ui").style.display = "none";
+    } else if(data.action === "zamanguncelle") {
+      document.getElementById("month").textContent = data.zaman || "";
+    }
+  });
+  window.addEventListener("message", function(event) {
+  const data = event.data;
+  const container = document.getElementById("bodycam-ui");
+
+  if(data.action === "showbodycam") {
+    container.style.display = "flex";
+    if (data.position === "left") {
+      container.style.left = "15px";
+      container.style.right = "auto";
+    } else {
+      container.style.right = "15px";
+      container.style.left = "auto";
+    }
+
+    document.getElementById("player").textContent = data.player || "PlayerName";
+    document.getElementById("callsign").textContent = data.callsign || "[000]";
+    document.getElementById("month").textContent = data.tarih || "00/00/0000 - 00:00:00 GMT+3";
+
+  } else if(data.action === "hidebodycam") {
+    container.style.display = "none";
+
+  } else if(data.action === "zamanguncelle") {
+    document.getElementById("month").textContent = data.zaman || "";
+
+  } else if(data.action === "updatePosition") {
+    if (data.position === "left") {
+      container.style.left = "15px";
+      container.style.right = "auto";
+    } else {
+      container.style.right = "15px";
+      container.style.left = "auto";
+    }
+  }
+});
+
+</script>
+
+</body>
+</html>
